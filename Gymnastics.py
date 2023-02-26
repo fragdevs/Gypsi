@@ -377,7 +377,7 @@ def looping():
         schedule.run_pending()
 
 
-xc = XChat.XChat("DQJLSTOKEN", "xq102210", "Gypsi_PLUS", "Shimano105YYDS")
+xc = XChat.XChat("--", "xq102210", "Gypsi_PLUS", "--")
 xc.message_function += [message_got]
 xc.join_function += [user_join]
 xc.leave_function += [user_leave]
