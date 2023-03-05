@@ -10,29 +10,35 @@ import schedule
 import _thread
 import websocket
 
+OPlist = []
+bindtrip = []
+bindname = []
+namefakeban = []
+tripfakeban = []
+hashfakeban = []
+cityfakeban = []
+
 Admin = ["Frag", "DQJL68"]
 
 CNL = ["restart", "addOP", "delOP", "blacklist", "bomb", "offline", "kick", "dumb", "help",
-       "listOP"]
+       "listOP","bind","unbind","bindlist"]
 
-CDL = ["重启Gypsi机器人", "添加协管权限识别码", "删除协管权限识别码",
-       "伪封禁某位用户的识别码/名称", "轰炸某人", "下线某位用户", "踢出某位用户",
-       "禁言某位用户", "查看指令帮助，有二级帮助", "协管列表"]
-
-CUL = ["~restart", "~addOP <被添加者的==识别码==>", "~delOP <被删除者的==识别码==>",
-       "~blacklist nick/trip/hash add/del/list nick/trip(如使用list参数则不需要此条)",
-       "~bomb <被轰炸者名字> <正整数>", "~offline (user)", "~kick (user)",
-       "~dumb (user) (time)", "~help <指令名称（可选）>", "~listOP"]
+Modlist = ["Outlier", "Frag", "stone", "Admin", "Y8WQ93", "cccccc", "iceice", "Win105",
+           "azazaz", "WQsbkl", "noip", "wuhu⭐", "orange", "YonHen", "yang"]
 
 ads = ["FragDev开发组招人啦!要求:技术上掌握基础python代码。无过高要求！ 欢迎前往 ?FragDev 了解详情。",
        "DCITYTEAM招人啦！要求:无过高要求！ 欢迎询问 灯确界L 了解详情。"]
 
-OPlist = []
-namefakeban = []
-tripfakeban = []
-hashfakeban = []
-Modlist = ["Outlier", "Frag", "stone", "Admin", "Y8WQ93", "cccccc", "iceice", "Win105",
-           "azazaz", "WQsbkl", "noip", "wuhu⭐", "orange", "YonHen", "5jbXdS", "yang"]
+CDL = ["重启Gypsi机器人", "添加协管权限识别码", "删除协管权限识别码",
+       "伪封禁某位用户的识别码/名称", "轰炸某人", "下线某位用户", "踢出某位用户",
+       "禁言某位用户", "查看指令帮助，有二级帮助", "协管列表","给名称绑定识别码",
+       "给名称解绑","绑定名称列表"]
+
+CUL = ["~restart", "~addOP <被添加者的==识别码==>", "~delOP <被删除者的==识别码==>",
+       "~blacklist nick/trip/hash/city add/del/list nick/trip(如使用list参数则不需要此条)",
+       "~bomb <被轰炸者名字> <正整数>", "~offline (user)", "~kick (user)",
+       "~dumb (user) (time)", "~help <指令名称（可选）>", "~listOP","~bind 名称 识别码","~unbind 名称","~bindlist"]
+
 
 readme = """.
 ## 嘿陌生人，欢迎来到XChat！
@@ -99,9 +105,40 @@ def reload():
             hashfakeban.append(line.strip('\n'))
         BH.close()
 
+    cityfakeban.clear()
+    with open('ban\\bannedcity.txt', encoding='utf-8') as BC:
+        line5 = BC.readlines()
+        for line in line5:
+            cityfakeban.append(line.strip('\n'))
+        BC.close()
+
+    bindname.clear()
+    with open('using\\name.txt', encoding='utf-8') as NameGet:
+        line6 = NameGet.readlines()
+        for line in line6:
+            bindname.append(line.strip('\n'))
+        NameGet.close()
+
+    bindtrip.clear()
+    with open('using\\trip.txt', encoding='utf-8') as TripGet:
+        line7 = TripGet.readlines()
+        for line in line7:
+            bindtrip.append(line.strip('\n'))
+        TripGet.close()
+
+def reloadon():
+    addname = open("using\\name.txt","w+",encoding="utf-8")
+    for i in range(len(bindname)):
+        addname.write(bindname[i]+"\n")
+    addname.close()
+
+    addtrip = open("using\\trip.txt","w+",encoding="utf-8")
+    for i in range(len(bindtrip)):
+        addtrip.write(bindtrip[i]+"\n")
+    addtrip.close()
 
 def message_got(message, sender, trip):
-    if message.startswith("~bomb"):
+    if message.startswith("~bomb "):
         if trip in OPlist:
             try:
                 list2 = message.split()
@@ -142,7 +179,7 @@ FragBot小提示：1. FragDev 开发组招人啦！要求:技术上掌握基础p
 2.DCITYTEAM招人啦！要求:无过高要求！ 欢迎询问 灯确界L 了解详情。
 3. 这个bot由灯确界托管，所以灯确界是联合作者！awa''')
 
-    if message.startswith("~addOP"):
+    if message.startswith("~addOP "):
         list10 = message.split()
         if trip in Modlist:
             try:
@@ -161,7 +198,7 @@ FragBot小提示：1. FragDev 开发组招人啦！要求:技术上掌握基础p
         else:
             xc.send_message("抱歉，您的权限无法执行此指令！")
 
-    if message.startswith("~delOP"):
+    if message.startswith("~delOP "):
         list11 = message.split()
         if trip in Modlist:
             try:
@@ -192,7 +229,7 @@ FragBot小提示：1. FragDev 开发组招人啦！要求:技术上掌握基础p
         a = ",".join(OPlist)
         xc.send_message("OP列表：" + a)
 
-    if message.startswith("~offline"):
+    if message.startswith("~offline "):
         list_offline = message.split()
         if trip in OPlist:
             try:
@@ -202,7 +239,7 @@ FragBot小提示：1. FragDev 开发组招人啦！要求:技术上掌握基础p
         else:
             xc.send_message("抱歉，您的权限无法执行此指令！")
 
-    if message.startswith("~kick"):
+    if message.startswith("~kick "):
         list_kick = message.split()
         if trip in OPlist:
             try:
@@ -212,7 +249,7 @@ FragBot小提示：1. FragDev 开发组招人啦！要求:技术上掌握基础p
         else:
             xc.send_message("抱歉，您的权限无法执行此指令！")
 
-    if message.startswith("~dumb"):
+    if message.startswith("~dumb "):
         list_dumb = message.split()
         if trip in OPlist:
             try:
@@ -228,7 +265,7 @@ FragBot小提示：1. FragDev 开发组招人啦！要求:技术上掌握基础p
         else:
             xc.send_message("抱歉，您的权限无法执行此指令！")
 
-    if message.startswith("~blacklist"):
+    if message.startswith("~blacklist "):
         if trip in Modlist:
             try:
                 list_fakeban = message.split()
@@ -307,28 +344,98 @@ FragBot小提示：1. FragDev 开发组招人啦！要求:技术上掌握基础p
                         hb = ",".join(hashfakeban)
                         xc.send_message("哈希伪封禁列表：" + hb)
 
+                if list_fakeban[1] == "city":
+
+                    if list_fakeban[2] == "add":
+                        banneduser = list_fakeban[3]
+                        hashfakeban.append(banneduser)
+                        addban = open('ban/bannedcity.txt', mode='a+', encoding='UTF-8')
+                        addban.write(banneduser + "\n")
+                        addban.close()
+                        reload()
+                        xc.send_message("操作成功！")
+
+                    if list_fakeban[2] == "del":
+                        banneduser = list_fakeban[3]
+                        delban = open('ban/bannedcity.txt', 'r+', encoding='UTF-8')
+                        ban = delban.readlines()
+                        delban = open('ban/bannedcity.txt', 'w+', encoding='UTF-8')
+                        for i in ban:
+                            delban.write(i.replace(banneduser + "\n", ""))
+                        reload()
+                        xc.send_message("操作成功！")
+
+                    if list_fakeban[2] == "list":
+                        hb = ",".join(cityfakeban)
+                        xc.send_message("地域伪封禁列表：" + hb)
+
             except IndexError:
                 xc.send_message("参数错误！")
         else:
-            xc.send_message("拒绝执行！")
+            xc.send_message("抱歉，您的权限无法执行此指令！")
 
     if message.startswith("^readme"):
         xc.send_to(sender, readme)
 
+    if message.startswith("~bind "):
+        list_bind = message.split()
+        try:
+            if list_bind[1] not in bindname:
+                if trip in Modlist:
+                    bindtrip.append(list_bind[2])
+                    bindname.append(list_bind[1])
+                    reloadon()
+                    xc.send_message("绑定成功！名称:{n},识别码:{t}。".format(n=list_bind[1],t=list_bind[2]))
+                else:
+                    xc.send_message("抱歉，您的权限无法执行此指令！")
+            else:
+                 xc.send_message("该名称已经绑定了识别码。")
+        except:
+            xc.send_message("缺少参数！")
 
-def user_join(nick, trip, userhash):
-    for i in range(namefakeban.index(namefakeban[-1]) + 1):
+    if message.startswith("~unbind "):
+        list_un = message.split()
+        if trip in Modlist:
+            try:
+                bindtrip.pop(bindname.index(list_un[1]))
+                bindname.pop(bindname.index(list_un[1]))
+                reloadon()
+                xc.send_message("解绑成功！名称:{n}。".format(n=list_un[1]))
+            except:
+                xc.send_message("缺少参数！")
+        else:
+            xc.send_message("抱歉，您的权限无法执行此指令！")
+
+    if message.startswith("~bindlist"):
+        a = ""
+        for i in range(len(bindname)):
+            a = a + bindname[i]+"绑定了"+bindtrip[i]+"\n"
+        xc.send_to(sender,".\n"+a)
+
+
+def user_join(nick, trip, userhash, city):
+    for i in range(len(namefakeban)):
         if namefakeban[i] in nick:
             xc.send_message("/kick {user} banned".format(user=nick))
 
-    for i in range(tripfakeban.index(tripfakeban[-1]) + 1):
+    for i in range(len(tripfakeban)):
         if tripfakeban[i] == trip:
             xc.send_message("/kick {user} banned".format(user=nick))
 
-    for i in range(hashfakeban.index(hashfakeban[-1]) + 1):
+    for i in range(len(hashfakeban)):
         if hashfakeban[i] == userhash:
             xc.send_message("/kick {user} banned".format(user=nick))
 
+    for i in range(len(cityfakeban)):
+        if cityfakeban[i] == city:
+            xc.send_message("/kick {user} banned".format(user=nick))
+
+    if nick in bindname:
+        if trip != bindtrip[bindname.index(nick)]:
+            xc.send_message("您绑定了识别码:{t}，不能进入聊天室。如果您是第一次来，请更改您的昵称！".format(t=bindtrip[bindname.index(nick)]))
+            xc.send_message("/offline "+nick)
+
+    print(city)
 
 def user_leave(nick):
     pass
@@ -366,7 +473,6 @@ def unlockroom():
 def adsending():
     xc.send_message(random.choice(ads))
 
-
 schedule.every().day.at("07:30").do(unlockroom)
 schedule.every().day.at("22:30").do(lockroom)
 schedule.every(45).minutes.do(adsending)
@@ -377,7 +483,7 @@ def looping():
         schedule.run_pending()
 
 
-xc = XChat.XChat("--", "xq102210", "Gypsi_PLUS", "--")
+xc = XChat.XChat("DQJLSTOKEN", "xq102210", "Gypsi", "Shimano105YYDS")
 xc.message_function += [message_got]
 xc.join_function += [user_join]
 xc.leave_function += [user_leave]
@@ -389,6 +495,7 @@ xc.send_message("全新Gypsi运行成功！输入`~help`查看帮助。")
 print("Start!")
 _thread.start_new_thread(looping, ())
 reload()
+reloadon()
 try:
     xc.run(False)
 except Exception as SthError:
@@ -396,6 +503,6 @@ except Exception as SthError:
         restart = sys.executable
         os.execl(restart, restart, *sys.argv)
     else:
-        print("死了")
+        print("Gypsi has caught a FATAL ERROR! Details:"+str(SthError))
 
 
