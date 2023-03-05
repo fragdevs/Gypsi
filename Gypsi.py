@@ -20,8 +20,8 @@ cityfakeban = []
 
 Admin = ["Frag", "DQJL68"]
 
-CNL = ["restart", "addOP", "delOP", "blacklist", "bomb", "offline", "kick", "dumb", "help",
-       "listOP","bind","unbind","bindlist"]
+CNL = ["restart", "addop", "delop", "blacklist", "bomb", "offline", "kick", "dumb", "help",
+       "listop","bind","unbind","listbind"]
 
 Modlist = ["Outlier", "Frag", "stone", "Admin", "Y8WQ93", "cccccc", "iceice", "Win105",
            "azazaz", "WQsbkl", "noip", "wuhu⭐", "orange", "YonHen", "yang"]
@@ -34,10 +34,10 @@ CDL = ["重启Gypsi机器人", "添加协管权限识别码", "删除协管权�
        "禁言某位用户", "查看指令帮助，有二级帮助", "协管列表","给名称绑定识别码",
        "给名称解绑","绑定名称列表"]
 
-CUL = ["~restart", "~addOP <被添加者的==识别码==>", "~delOP <被删除者的==识别码==>",
+CUL = ["~restart", "~addop <被添加者的==识别码==>", "~delop <被删除者的==识别码==>",
        "~blacklist nick/trip/hash/city add/del/list nick/trip(如使用list参数则不需要此条)",
        "~bomb <被轰炸者名字> <正整数>", "~offline (user)", "~kick (user)",
-       "~dumb (user) (time)", "~help <指令名称（可选）>", "~listOP","~bind 名称 识别码","~unbind 名称","~bindlist"]
+       "~dumb (user) (time)", "~help <指令名称（可选）>", "~listop","~bind 名称 识别码","~unbind 名称","~listbind"]
 
 
 readme = """.
@@ -172,14 +172,14 @@ def message_got(message, sender, trip):
 |等级|指令|
 |-|-|
 |Admin|\~restart|
-|Mod|\~addOP,\~delOP,\~ban|
+|Mod|\~addOP,\~delOP,\~ban,\~bind,\~unbind|
 |OP|~bomb,\~offline,\~kick,\~dumb|
-|Users|\~help,\~listOP|
-FragBot小提示：1. FragDev 开发组招人啦！要求:技术上掌握基础python代码。无过高要求！ 欢迎前往 ?FragDev 了解详情。
-2.DCITYTEAM招人啦！要求:无过高要求！ 欢迎询问 灯确界L 了解详情。
-3. 这个bot由灯确界托管，所以灯确界是联合作者！awa''')
+|Users|\~help,\~listOP,\~listbind|
+Gypsi小提示：1. FragDev 开发组招人啦！要求:技术上掌握基础python代码。无过高要求！ 欢迎前往 ?FragDev 了解详情。
+\2.DCITYTEAM招人啦！要求:无过高要求！ 欢迎询问 灯确界L 了解详情。
+\3. 这个bot由灯确界托管，所以灯确界是联合作者！awa''')
 
-    if message.startswith("~addOP "):
+    if message.startswith("~addop "):
         list10 = message.split()
         if trip in Modlist:
             try:
@@ -198,7 +198,7 @@ FragBot小提示：1. FragDev 开发组招人啦！要求:技术上掌握基础p
         else:
             xc.send_message("抱歉，您的权限无法执行此指令！")
 
-    if message.startswith("~delOP "):
+    if message.startswith("~delop "):
         list11 = message.split()
         if trip in Modlist:
             try:
@@ -225,7 +225,7 @@ FragBot小提示：1. FragDev 开发组招人啦！要求:技术上掌握基础p
         else:
             xc.send_message("抱歉，您的权限无法执行此指令！")
 
-    if message.startswith("~listOP"):
+    if message.startswith("~listop"):
         a = ",".join(OPlist)
         xc.send_message("OP列表：" + a)
 
@@ -406,7 +406,7 @@ FragBot小提示：1. FragDev 开发组招人啦！要求:技术上掌握基础p
         else:
             xc.send_message("抱歉，您的权限无法执行此指令！")
 
-    if message.startswith("~bindlist"):
+    if message.startswith("~listbind"):
         a = ""
         for i in range(len(bindname)):
             a = a + bindname[i]+"绑定了"+bindtrip[i]+"\n"
@@ -442,18 +442,11 @@ def user_leave(nick):
 
 
 def emote_got(message, nick, trip):
-    if message in ["Gypsi", "FragBot", "Frag"]:
-        xc.send_message("/me ?")
+    pass
 
 
 def whisper_got(message, nick, trip):
-    if message.startswith("~chat "):
-        if trip in Admin:
-            chatmsg = message[6:]
-            if not chatmsg.startswith("/addtempmod "):
-                xc.send_message(chatmsg)
-            else:
-                xc.send_message("居然想用机器人给临管，~~你是想造反么？~~")
+    pass
 
 
 def kill_errors(info):
@@ -500,9 +493,10 @@ try:
     xc.run(False)
 except Exception as SthError:
     if type(SthError) == websocket._exceptions.WebSocketConnectionClosedException:
+        print("Gypsi 掉线了！正在重新连接...")
         restart = sys.executable
         os.execl(restart, restart, *sys.argv)
     else:
-        print("Gypsi has caught a FATAL ERROR! Details:"+str(SthError))
-
-
+        print("Gypsi 出bug了！详细信息:"+str(SthError))
+        restart = sys.executable
+        os.execl(restart, restart, *sys.argv)
