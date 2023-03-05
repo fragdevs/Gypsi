@@ -10,7 +10,7 @@ import schedule
 import _thread
 import websocket
 
-OPlist = []
+oplist = []
 bindtrip = []
 bindname = []
 namefakeban = []
@@ -21,7 +21,7 @@ cityfakeban = []
 Admin = ["Frag", "DQJL68"]
 
 CNL = ["restart", "addop", "delop", "blacklist", "bomb", "offline", "kick", "dumb", "help",
-       "listop","bind","unbind","listbind"]
+       "listop","bind","unbind","bindlist"]
 
 Modlist = ["Outlier", "Frag", "stone", "Admin", "Y8WQ93", "cccccc", "iceice", "Win105",
            "azazaz", "WQsbkl", "noip", "wuhu⭐", "orange", "YonHen", "yang"]
@@ -37,7 +37,7 @@ CDL = ["重启Gypsi机器人", "添加协管权限识别码", "删除协管权�
 CUL = ["~restart", "~addop <被添加者的==识别码==>", "~delop <被删除者的==识别码==>",
        "~blacklist nick/trip/hash/city add/del/list nick/trip(如使用list参数则不需要此条)",
        "~bomb <被轰炸者名字> <正整数>", "~offline (user)", "~kick (user)",
-       "~dumb (user) (time)", "~help <指令名称（可选）>", "~listop","~bind 名称 识别码","~unbind 名称","~listbind"]
+       "~dumb (user) (time)", "~help <指令名称（可选）>", "~listop","~bind 名称 识别码","~unbind 名称","~bindlist"]
 
 
 readme = """.
@@ -77,12 +77,12 @@ _____
 
 
 def reload():
-    OPlist.clear()
-    with open('using\\TrustedUsers.txt', encoding='utf-8') as OPget:
-        line1 = OPget.readlines()
+    oplist.clear()
+    with open('using\\TrustedUsers.txt', encoding='utf-8') as opget:
+        line1 = opget.readlines()
         for line in line1:
-            OPlist.append(line.strip('\n'))
-        OPget.close()
+            oplist.append(line.strip('\n'))
+        opget.close()
 
     namefakeban.clear()
     with open('ban\\bannedname.txt', encoding='utf-8') as BN:
@@ -139,7 +139,7 @@ def reloadon():
 
 def message_got(message, sender, trip):
     if message.startswith("~bomb "):
-        if trip in OPlist:
+        if trip in oplist:
             try:
                 list2 = message.split()
                 BombNumber = int(list2[2])
@@ -172,9 +172,9 @@ def message_got(message, sender, trip):
 |等级|指令|
 |-|-|
 |Admin|\~restart|
-|Mod|\~addOP,\~delOP,\~ban,\~bind,\~unbind|
-|OP|~bomb,\~offline,\~kick,\~dumb|
-|Users|\~help,\~listOP,\~listbind|
+|Mod|\~addop,\~delop,\~ban,\~bind,\~unbind,\~blacklist|
+|op|~bomb,\~offline,\~kick,\~dumb|
+|Users|\~help,\~listop,\~listbind|
 Gypsi小提示：1. FragDev 开发组招人啦！要求:技术上掌握基础python代码。无过高要求！ 欢迎前往 ?FragDev 了解详情。
 \2.DCITYTEAM招人啦！要求:无过高要求！ 欢迎询问 灯确界L 了解详情。
 \3. 这个bot由灯确界托管，所以灯确界是联合作者！awa''')
@@ -183,12 +183,12 @@ Gypsi小提示：1. FragDev 开发组招人啦！要求:技术上掌握基础pyt
         list10 = message.split()
         if trip in Modlist:
             try:
-                if list10[1] in OPlist:
+                if list10[1] in oplist:
                     xc.send_message("添加失败！")
                 else:
-                    addOP = open('using/TrustedUsers.txt', mode='a+', encoding='UTF-8')
-                    addOP.write(list10[1] + "\n")
-                    addOP.close()
+                    addop = open('using/TrustedUsers.txt', mode='a+', encoding='UTF-8')
+                    addop.write(list10[1] + "\n")
+                    addop.close()
                     xc.send_message("添加成功！识别码：{}".format(list10[1]))
 
                     reload()
@@ -202,11 +202,11 @@ Gypsi小提示：1. FragDev 开发组招人啦！要求:技术上掌握基础pyt
         list11 = message.split()
         if trip in Modlist:
             try:
-                delOP = open('using/TrustedUsers.txt', 'r+', encoding='UTF-8')
-                OPget = delOP.readlines()
-                delOP = open('using/TrustedUsers.txt', 'w+', encoding='UTF-8')
-                for i in OPget:
-                    delOP.write(i.replace(list11[1] + "\n", ""))
+                delop = open('using/TrustedUsers.txt', 'r+', encoding='UTF-8')
+                opget = delop.readlines()
+                delop = open('using/TrustedUsers.txt', 'w+', encoding='UTF-8')
+                for i in opget:
+                    delop.write(i.replace(list11[1] + "\n", ""))
 
                 reload()
 
@@ -226,12 +226,12 @@ Gypsi小提示：1. FragDev 开发组招人啦！要求:技术上掌握基础pyt
             xc.send_message("抱歉，您的权限无法执行此指令！")
 
     if message.startswith("~listop"):
-        a = ",".join(OPlist)
-        xc.send_message("OP列表：" + a)
+        a = ",".join(oplist)
+        xc.send_message("op列表：" + a)
 
     if message.startswith("~offline "):
         list_offline = message.split()
-        if trip in OPlist:
+        if trip in oplist:
             try:
                 xc.send_message("/offline {user}".format(user=list_offline[1]))
             except IndexError:
@@ -241,7 +241,7 @@ Gypsi小提示：1. FragDev 开发组招人啦！要求:技术上掌握基础pyt
 
     if message.startswith("~kick "):
         list_kick = message.split()
-        if trip in OPlist:
+        if trip in oplist:
             try:
                 xc.send_message("/kick {user}".format(user=list_kick[1]))
             except IndexError:
@@ -251,7 +251,7 @@ Gypsi小提示：1. FragDev 开发组招人啦！要求:技术上掌握基础pyt
 
     if message.startswith("~dumb "):
         list_dumb = message.split()
-        if trip in OPlist:
+        if trip in oplist:
             try:
                 if float(list_dumb[2]) > 5:
                     xc.send_message("为防止滥用，此命令单次最多禁言用户 5 分钟。")
@@ -406,7 +406,7 @@ Gypsi小提示：1. FragDev 开发组招人啦！要求:技术上掌握基础pyt
         else:
             xc.send_message("抱歉，您的权限无法执行此指令！")
 
-    if message.startswith("~listbind"):
+    if message.startswith("~bindlist"):
         a = ""
         for i in range(len(bindname)):
             a = a + bindname[i]+"绑定了"+bindtrip[i]+"\n"
@@ -500,3 +500,5 @@ except Exception as SthError:
         print("Gypsi 出bug了！详细信息:"+str(SthError))
         restart = sys.executable
         os.execl(restart, restart, *sys.argv)
+
+
